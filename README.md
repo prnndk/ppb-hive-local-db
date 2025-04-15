@@ -65,5 +65,107 @@ hasil benchmark lebih baik ketimbang hive milik isar.
    hive.
 
    Selanjutnya untuk menginisialisasi hive maka pada fungsi main yang ada di file main.dart perlu
-   kita rubah fungsi tersebut untuk menjadi asynchronous
+   kita rubah fungsi tersebut untuk menjadi asynchronous. Lalu di dalam fungsi tersebut tuliskan
+   kode berikut ini
+
+   ```dart
+    void main() async {
+     WidgetsFlutterBinding.ensureInitialized();
+   
+     final appDocument = await getApplicationDocumentsDirectory();
+     await Hive.initFlutter(appDocument.path);
+   
+     Hive.registerAdapters();
+     await Hive.openBox<Finance>('myBox');
+   
+     final box = Hive.box<Finance>('myBox');
+   
+     if (box.isEmpty) {
+       box.addAll([
+         Finance(
+           id: 1,
+           name: 'Beli makan',
+           amount: 15000.00,
+           type: FinanceType.food,
+         ),
+         Finance(
+           id: 2,
+           name: 'Beli minum',
+           amount: 5000.00,
+           type: FinanceType.food,
+         ),
+         Finance(
+           id: 3,
+           name: 'Bayar UKT',
+           amount: 3000000.00,
+           type: FinanceType.education,
+         ),
+         Finance(
+           id: 4,
+           name: 'Beli buku',
+           amount: 150000.00,
+           type: FinanceType.entertainment,
+         ),
+       ]);
+     }
+   
+     runApp(
+       MaterialApp(
+         home: MyApp(),
+         theme: _buildTheme(Brightness.light),
+       ),
+     );
+   }
+    ```
+
+   Pada kode diatas Hive di inisialisasi dengan `await Hive.initFlutter(appDocument.path);` dimana
+   appDocument merupakan current path dari aplikasi kita. Selanjutnya perlu untuk menjalankan kode
+   ini
+
+   ```dart
+        Hive.registerAdapters();
+        await Hive.openBox<Finance>('myBox');
+   ```
+
+   Dua baris kode tersebut digunakan untuk mendaftarkan type adapter yang telah kita buat serta
+   untuk membuat sebuah box yang akan kita gunakan sebagai tempat untuk menyimpan data. Untuk line
+   of code selanjutnya berisi tentang migrasi data awal untuk melakukan cek di aplikasi.
+
+   Karena pada finance_list terdapat beberapa widget seperti jumlah pengeluaran statistik
+   pengeluaran dan list pengeluaran maka kita perlu untuk merubah penggunaan list menjadi
+   pemanggilan ke local db kita. Contohnya untuk mengambil seluruh data maka digunakan kode berikut
+   ini
+
+   ```dart
+
+      final financeData = Hive.box<Finance>('myBox').values;
+   
+   ```
+
+   Kode diatas akan memanggil seluruh data yang disimpan pada local database kita. Untuk merubah
+   menjadi list maka hanya perlu menambahkan menjadi
+
+   ```dart
+   
+        final financeData = Hive.box<Finance>('myBox').values.toList();
+     
+     ```
+
+   Selanjutnya untuk menjalankan proses create maka dari kode yang sebelumnya memasukkan ke dalam
+   list menjadi kode berikut ini
+
+   ```dart
+   
+   if (_nameController.text.isNotEmpty && amount != null) {
+                      setState(() {
+                        Hive.box<Finance>('myBox').add(
+                          Finance(
+                            id: Hive.box<Finance>('myBox').length + 1,
+                            name: _nameController.text,
+                            amount: amount,
+                            type: _selectedType,
+                          ),
+                        );
+                      });
+      ```
 

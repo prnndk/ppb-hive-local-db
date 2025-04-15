@@ -22,7 +22,7 @@ class _FinanceListState extends State<FinanceList> {
 
   @override
   Widget build(BuildContext context) {
-    final financeDatum = Hive.box<Finance>('myBox').values;
+    final financeData = Hive.box<Finance>('myBox').values;
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
       body: Padding(
@@ -31,12 +31,12 @@ class _FinanceListState extends State<FinanceList> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             FinanceOverview(
-              totalAmount: financeDatum.fold(
+              totalAmount: financeData.fold(
                 0,
                 (sum, item) => sum + item.amount,
               ),
             ),
-            FinanceStatistic(finances: financeDatum.toList()),
+            FinanceStatistic(finances: financeData.toList()),
             SizedBox(height: 5.0),
             Text(
               'Finance Record',
@@ -75,14 +75,14 @@ class _FinanceListState extends State<FinanceList> {
             ),
             Expanded(
               child:
-                  financeDatum.isEmpty
+                  financeData.isEmpty
                       ? const Center(
                         child: Text("Currently no transaction has been made"),
                       )
                       : ListView.builder(
-                        itemCount: financeDatum.length,
+                        itemCount: financeData.length,
                         itemBuilder: (context, index) {
-                          final finance = financeDatum.toList()[index];
+                          final finance = financeData.toList()[index];
                           return FinanceCard(
                             finance: finance,
                             delete: () {
