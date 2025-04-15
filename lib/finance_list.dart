@@ -308,12 +308,6 @@ class _FinanceListState extends State<FinanceList> {
                     double? amount = double.tryParse(_amountController.text);
                     if (_nameController.text.isNotEmpty && amount != null) {
                       setState(() {
-                        // finances[index] = Finance(
-                        //   id: finance.id,
-                        //   name: _nameController.text,
-                        //   amount: amount,
-                        //   type: _selectedType,
-                        // );
                         Hive.box<Finance>('myBox').put(
                           finance.key,
                           Finance(
